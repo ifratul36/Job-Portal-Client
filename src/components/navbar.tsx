@@ -28,6 +28,7 @@ export function Navbar() {
             </Link>
 
             <div className="hidden md:flex items-center space-x-6">
+              {/* dashboard */}
               <Link href="/dashboard" className="text-sm font-medium hover:text-brand-600 transition-colors">
                 Dashboard
               </Link>
