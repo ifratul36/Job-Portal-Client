@@ -3,13 +3,15 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 
+type Role = "admin" | "user" | "moderator" // stricter if you like
+
 interface User {
   id: string
   name: string
   email: string
   avatar?: string
+  role: Role
 }
-
 
 interface AuthContextType {
   user: User | null
@@ -26,25 +28,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check for stored user data on mount
     const storedUser = localStorage.getItem("career-code-user")
     if (storedUser) {
-      setUser(JSON.parse(storedUser))
+      setUser(JSON.parse(storedUser) as User) // 👈 type‑cast
     }
     setLoading(false)
   }, [])
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((r) => setTimeout(r, 1000))
 
-    // Mock authentication - in real app, this would be an API call
     if (email && password) {
       const mockUser: User = {
         id: "1",
         name: email.split("@")[0],
-        email: email,
+        email,
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
+        role: "admin",               // 👈 add role
       }
       setUser(mockUser)
       localStorage.setItem("career-code-user", JSON.stringify(mockUser))
@@ -54,16 +54,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((r) => setTimeout(r, 1000))
 
-    // Mock registration - in real app, this would be an API call
     if (name && email && password) {
       const mockUser: User = {
         id: Date.now().toString(),
-        name: name,
-        email: email,
+        name,
+        email,
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
+        role: "user",                // 👈 add role
       }
       setUser(mockUser)
       localStorage.setItem("career-code-user", JSON.stringify(mockUser))
@@ -77,13 +76,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("career-code-user")
   }
 
-  return <AuthContext.Provider value={{ user, login, register, logout, loading }}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider")
   return context
 }
