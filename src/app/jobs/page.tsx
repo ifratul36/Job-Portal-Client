@@ -144,7 +144,7 @@ export default function JobsPage() {
       filteredJobs = filteredJobs.filter((job) => job.type === jobType)
     }
 
-    // Experience level filter
+    // Experience level filter & filter
     if (experienceLevel && experienceLevel !== "all") {
       filteredJobs = filteredJobs.filter((job) => job.experienceLevel === experienceLevel)
     }
